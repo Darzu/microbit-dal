@@ -395,6 +395,23 @@ public:
     int scrollAsync(ManagedString s, int delay = MICROBIT_DEFAULT_SCROLL_SPEED);
 
     /**
+      * Scrolls the given string to the display, from left to right.
+      * Returns immediately, and executes the animation asynchronously.
+      *
+      * @param s The string to display.
+      *
+      * @param delay The time to delay between characters, in milliseconds. Defaults
+      *              to: MICROBIT_DEFAULT_SCROLL_SPEED.
+      *
+      * @return MICROBIT_OK, MICROBIT_BUSY if the display is already in use, or MICROBIT_INVALID_PARAMETER.
+      *
+      * @code
+      * display.scrollbackwardsAsync("abc123",100);
+      * @endcode
+      */
+    int scrollbackwardsAsync(ManagedString s, int delay = MICROBIT_DEFAULT_SCROLL_SPEED);
+
+    /**
       * Scrolls the given image across the display, from right to left.
       * Returns immediately, and executes the animation asynchronously.
       *
@@ -430,6 +447,24 @@ public:
       * @endcode
       */
     int scroll(ManagedString s, int delay = MICROBIT_DEFAULT_SCROLL_SPEED);
+
+      /**
+      * TEST METHOD by Daryl
+      * Scrolls the given string across the display, from left to right.
+      * Blocks the calling thread until all text has been displayed.
+      *
+      * @param s The string to display.
+      *
+      * @param delay The time to delay between characters, in milliseconds. Defaults
+      *              to: MICROBIT_DEFAULT_SCROLL_SPEED.
+      *
+      * @return MICROBIT_OK, MICROBIT_CANCELLED or MICROBIT_INVALID_PARAMETER.
+      *
+      * @code
+      * display.scrollbackwards("abc123",100);
+      * @endcode
+      */
+    int scrollbackwards(ManagedString s, int delay = MICROBIT_DEFAULT_SCROLL_SPEED);
 
     /**
       * Scrolls the given image across the display, from right to left.

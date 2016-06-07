@@ -711,6 +711,46 @@ int MicroBitDisplay::print(MicroBitImage i, int x, int y, int alpha, int delay)
 }
 
 /**
+  * Scrolls the given string to the display, from left to right.
+  * Returns immediately, and executes the animation asynchronously.
+  *
+  * @param s The string to display.
+  *
+  * @param delay The time to delay between characters, in milliseconds. Defaults
+  *              to: MICROBIT_DEFAULT_SCROLL_SPEED.
+  *
+  * @return MICROBIT_OK, MICROBIT_BUSY if the display is already in use, or MICROBIT_INVALID_PARAMETER.
+  *
+  * @code
+  * display.scrollbackwardsAsync("abc123",100);
+  * @endcode
+  */
+int MicroBitDisplay::scrollbackwardsAsync(ManagedString s, int delay)
+{
+    //sanitise this value
+    if(delay <= 0)
+        return MICROBIT_INVALID_PARAMETER;
+
+    // If the display is free, it's our turn to display.
+    if (animationMode == ANIMATION_MODE_NONE || animationMode == ANIMATION_MODE_STOPPED)
+    {
+        scrollingPosition = width+1;
+        scrollingChar = 0;
+        scrollingText = s;
+
+        animationDelay = delay;
+        animationTick = 0;
+        animationMode = ANIMATION_MODE_SCROLL_TEXT;
+    }
+    else
+    {
+        return MICROBIT_BUSY;
+    }
+
+    return MICROBIT_OK;
+}
+
+/**
   * Scrolls the given string to the display, from right to left.
   * Returns immediately, and executes the animation asynchronously.
   *
@@ -789,6 +829,48 @@ int MicroBitDisplay::scrollAsync(MicroBitImage image, int delay, int stride)
     else
     {
         return MICROBIT_BUSY;
+    }
+
+    return MICROBIT_OK;
+}
+
+/**
+  * Scrolls the given string across the display, from left to right.
+  * Blocks the calling thread until all text has been displayed.
+  *
+  * @param s The string to display.
+  *
+  * @param delay The time to delay between characters, in milliseconds. Defaults
+  *              to: MICROBIT_DEFAULT_SCROLL_SPEED.
+  *
+  * @return MICROBIT_OK, MICROBIT_CANCELLED or MICROBIT_INVALID_PARAMETER.
+  *
+  * @code
+  * display.scrollbackwards("abc123",100);
+  * @endcode
+  */
+int MicroBitDisplay::scrollbackwards(ManagedString s, int delay)
+{
+    //sanitise this value
+    if(delay <= 0)
+        return MICROBIT_INVALID_PARAMETER;
+
+    // If there's an ongoing animation, wait for our turn to display.
+    this->waitForFreeDisplay();
+
+    // If the display is free, it's our turn to display.
+    // If someone called stopAnimation(), then we simply skip...
+    if (animationMode == ANIMATION_MODE_NONE)
+    {
+        // Start the effect.
+        this->scrollbackwardsAsync(s, delay);
+
+        // Wait for completion.
+        fiberWait();
+    }
+    else
+    {
+        return MICROBIT_CANCELLED;
     }
 
     return MICROBIT_OK;
