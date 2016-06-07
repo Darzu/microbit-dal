@@ -53,6 +53,7 @@ enum AnimationMode {
     ANIMATION_MODE_NONE,
     ANIMATION_MODE_STOPPED,
     ANIMATION_MODE_SCROLL_TEXT,
+    ANIMATION_MODE_SCROLL_LR_TEXT,
     ANIMATION_MODE_PRINT_TEXT,
     ANIMATION_MODE_SCROLL_IMAGE,
     ANIMATION_MODE_ANIMATE_IMAGE,
@@ -189,6 +190,12 @@ class MicroBitDisplay : public MicroBitComponent
       * Shift the screen image by one pixel to the left. If necessary, paste in the next char.
       */
     void updateScrollText();
+
+    /**
+      * Internal scrollbackwardsText update method.
+      * Shift the screen image by one pixel to the right. If necessary, paste in the next char.
+      */
+    void updateScrollbackwardsText();
 
     /**
       * Internal printText update method.

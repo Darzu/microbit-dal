@@ -281,6 +281,9 @@ MicroBitDisplay::animationUpdate()
         if (animationMode == ANIMATION_MODE_SCROLL_TEXT)
             this->updateScrollText();
 
+        if (animationMode == ANIMATION_MODE_SCROLL_LR_TEXT)
+            this->updateScrollbackwardsText();
+
         if (animationMode == ANIMATION_MODE_PRINT_TEXT)
             this->updatePrintText();
 
@@ -333,6 +336,31 @@ void MicroBitDisplay::updateScrollText()
             return;
         }
         scrollingChar++;
+   }
+}
+
+/**
+  * Internal scrollbackwardsText update method.
+  * Shift the screen image by one pixel to the right. If necessary, paste in the next char.
+  */
+void MicroBitDisplay::updateScrollbackwardsText()
+{
+    image.shiftRight(1);
+    scrollingPosition++;
+
+    if (scrollingPosition == width + MICROBIT_DISPLAY_SPACING)
+    {
+        scrollingPosition = 0;
+
+        image.print(scrollingChar > 0 ? scrollingText.charAt(scrollingChar-1) : ' ',0/*HACK*/,0);
+
+        if (scrollingChar == 0)
+        {
+            animationMode = ANIMATION_MODE_NONE;
+            this->sendAnimationCompleteEvent();
+            return;
+        }
+        scrollingChar--;
    }
 }
 
@@ -734,13 +762,13 @@ int MicroBitDisplay::scrollbackwardsAsync(ManagedString s, int delay)
     // If the display is free, it's our turn to display.
     if (animationMode == ANIMATION_MODE_NONE || animationMode == ANIMATION_MODE_STOPPED)
     {
-        scrollingPosition = width+1;
-        scrollingChar = 0;
+        scrollingPosition = width-1;
         scrollingText = s;
+        scrollingChar = scrollingText.length();
 
         animationDelay = delay;
         animationTick = 0;
-        animationMode = ANIMATION_MODE_SCROLL_TEXT;
+        animationMode = ANIMATION_MODE_SCROLL_LR_TEXT;
     }
     else
     {
@@ -780,7 +808,7 @@ int MicroBitDisplay::scrollAsync(ManagedString s, int delay)
 
         animationDelay = delay;
         animationTick = 0;
-        animationMode = ANIMATION_MODE_SCROLL_TEXT;
+        animationMode = ANIMATION_MODE_SCROLL_LR_TEXT;
     }
     else
     {
