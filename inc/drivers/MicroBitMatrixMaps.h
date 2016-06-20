@@ -149,8 +149,9 @@ const MatrixMap microbitMatrixMap =
     MICROBIT_DISPLAY_HEIGHT,
     MICROBIT_DISPLAY_ROW_COUNT,
     MICROBIT_DISPLAY_COLUMN_COUNT,
-    ROW1,
-    COL1,
+    //HACK(dz): putting in raw pin to try to make this build for the nrf51-dk board
+    p13, //ROW1,
+    p4, //COL1,
     microbitDisplayMap
 };
 
